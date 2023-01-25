@@ -5,7 +5,11 @@ import math
 from functools import partial
 # init tk
 root = tkinter.Tk()
-
+root.attributes('-topmost', True)
+root.update()
+def stay_on_top():
+   root.lift()
+   root.after(2000, stay_on_top)
 # create canvas
 canv = tkinter.Canvas(root, bg="white", height=600, width=600)
 pos = 50, 50
@@ -57,11 +61,6 @@ def draw_line_points(coord1,coord2, distance, offsets, width, color):
 
 state = np.uint16(0)
 lengths = [3, 4, 3, 2]
-# for i in range(4):
-#     for j in range(8):
-#         print(get_bit_value(numbers[i], j), end=" ")
-#     print()
-
 
 
 def create_loop(start):
@@ -140,7 +139,55 @@ def callback(event):
                 # draw_point([x, y], diameter, "green" if new_value == 1 else "red")
                 # print("clicked at rel", i, j)
     print("clicked at", event.x, event.y)
-        
+
+def check_state_finished(state):
+    positions = [[0,1],[1,1],[1,2],[2,0],[2,1],[2,2]]
+    for i in range(len(positions)):
+        if get_value(state, positions[i][0], positions[i][1]) == 0:
+            return False
+    return True
+
+def print_state(state):
+    for i in range(len(lengths)):
+        if i == 0 or i == 2:
+            print(" ", end="")
+        if i == 3:
+            print("  ", end="")
+        for j in range(lengths[i]):
+            print(get_value(state, i, j), end=" ")
+        print()
+
+def solve_puzzle():
+    # print_state(state)
+    used_states = set()
+    used_states.add(state)
+    queue = [(state,[])]
+    while len(queue) > 0:
+        cur_state, moves = queue.pop(0)
+
+        for i in range(len(loops)):
+            for offset in range(len(loops[i])):
+                new_state = rotate_loop(cur_state, loops[i], offset)
+                # print("change", i, offset)
+                # print_state(new_state)
+
+                if new_state in used_states:
+                    continue
+                used_states.add(new_state)
+                new_moves = moves.copy()
+                new_moves.append((i, offset))
+                queue.append((new_state, new_moves))
+
+                if check_state_finished(new_state):
+                    print("solution found")
+                    print(new_moves)
+                    return
+
+                
+
+    print("no solution found")
+    return
+
 # draw arcs
 python_green = "#476042"
 coord = 10, 10, 300, 300
@@ -162,6 +209,13 @@ for i,button_pos in enumerate(buttons_pos):
     canv.create_window(button_pos[0], button_pos[1], anchor=tk.NW, window=buttons[i][1])
     canv.create_window(button_pos[0], button_pos[1], anchor=tk.NE, window=buttons[i][0])
 
+solve_button = tk.Button(canv, text="Solve", command=solve_puzzle)
+
+canv.create_window(pos[0]+4*distance, pos[1]+3*distance/2, anchor=tk.NW, window=solve_button)
+
+answer_label = tk.Label(canv, text="Answer\nanwer1\nanswer2", font=(None, 15))
+
+canv.create_window(pos[0]+1*distance, pos[1]+4.5*distance, anchor=tk.NW, window=answer_label)
 
 # arc = myCanvas.create_arc(coord, start=0, extent=150, fill="red")
 # arv2 = myCanvas.create_arc(coord, start=150, extent=215, fill="green")
@@ -177,7 +231,7 @@ for i,button_pos in enumerate(buttons_pos):
 
 # positions 
 # for 
-
+    
 # canv.create_oval(pos[0], pos[1], pos[0]+diameter, pos[1]+diameter, fill=python_green)
 # canv.create_oval(pos[0], pos[1], pos[0]+diameter, pos[1]+diameter, fill="red")
 

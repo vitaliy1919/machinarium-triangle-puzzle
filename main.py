@@ -8,11 +8,14 @@ from utils import *
 # init tk
 root = tkinter.Tk() 
 root.title("Machinarium Traingle Puzzle Solver")
+frame = tk.Frame(root)
+
 # root.attributes('-topmost', True)
 # root.update()
 
 # create canvas
-canvas = tkinter.Canvas(root, bg="white", height=600, width=600)
+# canvas = tkinter.Canvas(root, bg="white", height=600, width=600)
+canvas = tkinter.Canvas(frame, bg="white")
 pos = 50, 50
 diameter = 20
 distance = 50
@@ -26,10 +29,8 @@ state = BoardState(np.uint16(0))
 points = []
 for loop in loops:
     for i in range(len(loop)):
-        if i == len(loop)-1:
-            draw_line_points(canvas, pos, loop[i],  loop[0], diameter, distance, offsets, 2, "black")
-        else:
-            draw_line_points(canvas, pos, loop[i],  loop[i+1], diameter, distance, offsets, 2, "black")
+        # if i == len(loop)-1:
+        draw_line_points(canvas, pos, loop[i],  loop[(i+1)%len(loop)], diameter, distance, offsets, 2, "black")
 
 for i in range(len(lengths)):
     cur_points = []
@@ -161,11 +162,20 @@ class State:
 
 def solve_puzzle(lable):
     used_states = set()
+    count = 0
+    for j in range(16):
+        if get_bit_value(state.state, j) == 1:
+            count += 1
+    if count != 6:
+        lable.config(text=f"6 dots needs to be green.\nCurrently green: {count}")
+
+        return
     used_states.add(state)
     if state.is_finished():
         lable.config(text="Already solved")
         return
     queue = [(state.state,[])]
+    
     while len(queue) > 0:
         cur_state, moves = queue.pop(0)
 
@@ -209,9 +219,7 @@ def solve_puzzle(lable):
     print("no solution found")
     return
 
-print("solving all puzzles")
-# solve_all_puzzles()
-print("done solving all puzzles")
+
 # draw arcs
 python_green = "#476042"
 coord = 10, 10, 300, 300
@@ -235,7 +243,7 @@ for i,button_pos in enumerate(buttons_pos):
 
 
 
-answer_label = tk.Label(canvas, text="", font=(None, 15), justify=tk.LEFT)
+answer_label = tk.Label(frame, text="", font=(None, 15), justify=tk.LEFT)
 canvas.create_window(pos[0]+0.5*distance, pos[1]+4.5*distance, anchor=tk.NW, window=answer_label)
 
 solve_button = tk.Button(canvas, text="Solve", command=partial(solve_puzzle, answer_label))
@@ -261,6 +269,10 @@ canvas.create_window(pos[0]+4*distance, pos[1]+3*distance/2, anchor=tk.W, window
 # canv.create_oval(pos[0], pos[1], pos[0]+diameter, pos[1]+diameter, fill="red")
 
 # add to window and show
+# answer_label.config(text="1\n1\n1\n1\n1\n")
+answer_label.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 canvas.bind("<Button-1>", on_canvas_click)
-canvas.pack()
+canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+frame.pack(fill=tk.BOTH, expand=True)
+
 root.mainloop()

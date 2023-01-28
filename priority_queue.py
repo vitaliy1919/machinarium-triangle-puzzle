@@ -1,4 +1,6 @@
-# from https://github.com/denizetkar/priority-queue
+# taken from https://github.com/denizetkar/priority-queue
+# used for dijkstra's algorithm
+
 class PriorityQueue:
     def __init__(
         self,

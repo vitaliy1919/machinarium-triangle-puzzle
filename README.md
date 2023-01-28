@@ -6,11 +6,13 @@ There are three tools in this repository: a python script that allows you to int
 
 Python script:
 
-![Example of a main python script](/images/puzzle_code.png "Main app")
+<img src="images/puzzle_code.png" width="50%" />
+
 
 Web app:
 
-![Example of a web app](/images/puzzle_website.png "Wev app")
+<img src="images/puzzle_website.png" width="50%" />
+
 
 # Installation and Usage
 

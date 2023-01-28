@@ -1,6 +1,7 @@
 from state import *
 from utils import get_bit_value, set_bit_value
 from priority_queue import PriorityQueue
+import json
 def calculate_all_puzzles_dijkstra():
     possible_states = []
     solved_state = 0
@@ -51,6 +52,7 @@ def calculate_all_puzzles_dijkstra():
     # print(distances)
     moves = {}
     for state in possible_states:
+        state = int(state)
         moves[state] = []
         cur_state = state
         while cur_state != solved_state:
@@ -58,17 +60,21 @@ def calculate_all_puzzles_dijkstra():
             moves[state].append(edges_dict[cur_state][prev_state])
             cur_state = prev_state
     # print(moves)
+    with open("solutions.json", "w") as outfile:
+        json.dump(moves, outfile)
     f = open("solutions.txt", "w")
     hard_f = open("hard.txt","w")
-    for state, moves in moves.items():
-        if len(moves) >= 4:
+    i = 0
+    for state, cur_moves in moves.items():
+        if len(cur_moves) >= 4:
+            i += 1
             print_state(state, file=hard_f)
             # print()
-            print(moves, file=hard_f)
+            print(cur_moves, file=hard_f)
 
         print_state(state, file=f)
-        print(moves, file=f)
-
+        print(cur_moves, file=f)
+    print(i/len(moves))
     f.close()
     hard_f.close()
     # length = 0

@@ -5,11 +5,12 @@
         <meta name="viewport" content="width=device-width">
         <title>Triangle Puzzle from Machinarium</title>
         <link rel="stylesheet" href="styles.css">
+        <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
       </head>
 <body>
 <div class="container">
         <h1>
-            Triangle Puzzle from Machinarium
+            Triangle Puzzle from Machinarium (<a href="https://machinarium.fandom.com/wiki/Prison_Safe_Puzzle">Prison Safe Puzzle</a>)
         </h1>
         
 </div>
@@ -17,9 +18,17 @@
 <div class="container">
     <canvas>
         Your browser does not support the HTML canvas tag.
-        </canvas>
+    </canvas>
+
+    <button id="solve" type="button"><h2>Solve</h2></button>
+</div>
+<div class="container">
+    <p style="font-size:24px;" id="result">
+        Press "Solve" to see the solution.
+    </p>
 </div>
 
+<script type="text/javascript" src="solutions.js"></script>
 <script src="main.js"></script>
 
 </body>

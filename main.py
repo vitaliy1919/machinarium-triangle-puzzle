@@ -241,7 +241,7 @@ for i,button_pos in enumerate(buttons_pos):
     canvas.create_window(button_pos[0], button_pos[1], anchor=tk.NW, window=buttons[i][1])
     canvas.create_window(button_pos[0], button_pos[1], anchor=tk.NE, window=buttons[i][0])
 
-
+# canva
 
 answer_label = tk.Label(frame, text="", font=(None, 15), justify=tk.LEFT)
 canvas.create_window(pos[0]+0.5*distance, pos[1]+4.5*distance, anchor=tk.NW, window=answer_label)
@@ -249,6 +249,10 @@ canvas.create_window(pos[0]+0.5*distance, pos[1]+4.5*distance, anchor=tk.NW, win
 solve_button = tk.Button(canvas, text="Solve", command=partial(solve_puzzle, answer_label))
 
 canvas.create_window(pos[0]+4*distance, pos[1]+3*distance/2, anchor=tk.W, window=solve_button)
+
+canvas.create_text( pos[0] + distance / 6, pos[1] + distance / 2, text="1", font=(None, 15))
+canvas.create_text( pos[0] + distance / 6 + 3*distance, pos[1] + distance / 2, text="2", font=(None, 15))
+canvas.create_text( pos[0] + 1.7 * distance, pos[1] + distance / 2 + 2.9*distance, text="3", font=(None, 15))
 
 # arc = myCanvas.create_arc(coord, start=0, extent=150, fill="red")
 # arv2 = myCanvas.create_arc(coord, start=150, extent=215, fill="green")

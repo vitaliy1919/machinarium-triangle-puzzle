@@ -8,19 +8,30 @@ function isMobile() {
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 
-let canvas_ratio = 0.25;
+let canvas_ratio = 0.2;
 console.log(window.innerWidth, window.innerHeight)
 if (window.innerWidth < window.innerHeight) {
-    canvas_ratio = 0.8;
+    canvas_ratio = 0.9;
 }
 
+const pos = [10,10];
+
 const width = canvas.width = canvas_ratio*window.innerWidth;
-const height = canvas.height = window.innerHeight;
+
+distance = (width - pos[0]) / 3.5  
+console.log(distance)
+diameter = 0.4 * distance
+ctx.font = "48px serif";
+
+const metrics  = ctx.measureText("3");
+let fontHeight = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent;
+let actualHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+const height = canvas.height = pos[1]+3.5*distance + actualHeight;
+
 const loop_starts = [[0,0,0],[0,1,0],[1,1,-1]];
 const lengths = [3, 4, 3, 2];
 
-distance = width / 3.8
-diameter = 0.6 * distance
+
 
 function calculate_position(pos, i, j, distance, offsets) {
     x = pos[0]+j*distance;
@@ -69,6 +80,18 @@ function draw_point(context, pos, diameter, color) {
     // return canvas.create_oval(pos[0], pos[1], pos[0]+diameter, pos[1]+diameter, fill=color)
 }
 
+function draw_circle(context, pos, diameter, color) {
+    
+    context.beginPath();
+    context.arc(pos[0], pos[1], diameter / 2, 0, 2 * Math.PI, false);
+    // context.fillStyle = color;
+    // context.fill();
+    context.lineWidth = 2
+    context.stroke();
+
+    // return canvas.create_oval(pos[0], pos[1], pos[0]+diameter, pos[1]+diameter, fill=color)
+}
+
 
 function createLoop(start) {
     let items = [];
@@ -93,7 +116,6 @@ for (start of loop_starts) {
     loops.push(createLoop(start));
 }
 console.log(loops[0]);
-const pos = [10,10];
 
 let state = new Uint16Array(1);
 
@@ -128,6 +150,9 @@ function get_color(state) {
 // state[0] = set_bit_value(state[0],1, 1)
 // console.log(state[0])
 
+const loop_center = [[1,1],[1,2], [2,1]]
+const colors = ["DarkBlue", "DarkOliveGreen", "DarkGoldenRod"]
+let result_label = document.getElementById("result");
 function redraw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (loop of loops) {
@@ -135,6 +160,10 @@ function redraw() {
             draw_line_points(ctx, pos, loop[i],  loop[(i+1)%loop.length], diameter, distance, offsets, 2, "black");
         }
     }
+    // for (start of loop_center) {
+    //     const center = calculate_position_center(pos, start[0], start[1], diameter, distance, offsets)
+    //     draw_circle(ctx, center, distance*2, "black")
+    // }
     
     for (let i = 0; i <lengths.length; i++) {
         for (let j = 0; j < lengths[i]; j++) {
@@ -144,8 +173,22 @@ function redraw() {
             draw_point(ctx, [x, y], diameter, color);
         }
     }
+    ctx.font = "48px serif";
+    ctx.fillStyle = colors[0];
+    ctx.fillText("1", pos[0] + distance / 6, pos[1] + distance / 1.5);
+    ctx.fillStyle = colors[1];
+
+    ctx.fillText("2", pos[0] + distance / 6 + 3*distance, pos[1] + distance / 1.5);
+
+    ctx.fillStyle = colors[2];
+
+    ctx.fillText("3", pos[0] + 1.6 * distance, pos[1] + distance / 1.5 + 3*distance);
+
+
 }
-    
+
+redraw();
+
 canvas.addEventListener('click', function(event) {
     const rect = canvas.getBoundingClientRect()
     var click_x = event.clientX - rect.left,
@@ -170,13 +213,47 @@ canvas.addEventListener('click', function(event) {
     
 
 }, false);
-    // for i in range(len(loop)):
-    //     if i == len(loop)-1:
-    //         draw_line_points(canvas, pos, loop[i],  loop[0], diameter, distance, offsets, 2, "black")
-    //     else:
-    //         draw_line_points(canvas, pos, loop[i],  loop[i+1], diameter, distance, offsets, 2, "black")
+solutions = JSON.parse(moves);
+console.log(solutions);
+document.getElementById("solve").onclick = function() {
+    count = 0
+    for (let j = 0; j < 16; j++) {
+        if (get_bit_value(state[0], j) == 1)
+            count += 1
+    }
+    if (count != 6){
+        result_label.innerHTML = `6 dots needs to be green.<br>Currently green: ${count}`;
+        return
+    }
 
-// ctx.moveTo(0,0);
-// ctx.lineTo(200,100);
-// ctx.stroke();
-redraw();
+    description = "";
+    const moves = solutions[state[0]];
+    if (moves.length == 0) {
+        description = "The puzzle is already solved.";
+    }
+    for (let move of moves) {
+
+        gear_number = move[0]+1;
+        gear_with_color = "<span style='color:" + colors[move[0]] + "'>" + gear_number + "</span>";
+        description += "Gear " + gear_with_color + " ";
+        if (move[1] > 3) {
+            description += "↶ counter-clockwise " + (6-move[1]) + " ";
+            if (6-move[1] == 1) {
+                description += "time";
+            } else {
+                description += "times";
+            }
+        } else {
+            description += "↷ clockwise " + (move[1]) + " ";
+            if (move[1] == 1) {
+                description += "time";
+            } else {
+                description += "times";
+            }
+        }
+        description += "<br>";
+    }
+    result_label.innerHTML = description;
+
+    console.log(solutions[state[0]]);
+}
